@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { Button } from './Button';
 
 export function Navigation() {
   const pathname = usePathname();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const links = [
     { href: '/', label: 'Accueil' },
@@ -47,9 +50,29 @@ export function Navigation() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <button className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-              Connexion
-            </button>
+            {isAuthenticated ? (
+              <>
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {user?.email}
+                </span>
+                <Button variant="ghost" size="sm" onClick={logout}>
+                  Déconnexion
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login">
+                  <Button variant="ghost" size="sm">
+                    Connexion
+                  </Button>
+                </Link>
+                <Link href="/auth/signup">
+                  <Button variant="primary" size="sm">
+                    S'inscrire
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
