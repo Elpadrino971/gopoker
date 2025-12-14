@@ -3,30 +3,32 @@
 ## Stack Technique
 
 ### Frontend
-- **Framework** : React Native (Expo SDK 51+)
+- **Framework** : Next.js 15+ (App Router)
 - **Langage** : TypeScript
-- **Navigation** : React Navigation v6
-- **State Management** : Zustand + React Query
-- **UI Library** : React Native Paper + Custom components
-- **Styling** : StyleSheet + Theme system
+- **Routing** : Next.js App Router (file-based routing)
+- **State Management** : Zustand + React Query (@tanstack/react-query)
+- **UI Components** : Custom components with Tailwind CSS
+- **Styling** : Tailwind CSS v4 + CSS Modules
+- **PWA** : next-pwa pour Progressive Web App (offline, installable)
 
 ### Backend
 - **BaaS** : Supabase
   - PostgreSQL database
-  - Authentication
+  - Authentication (Email, Google, Apple)
   - Real-time subscriptions
   - Storage (images, exports)
-  - Edge Functions (calculs complexes)
+  - Edge Functions (calculs complexes, webhooks Stripe)
 
 ### Paiements
-- **Stripe** : Abonnements récurrents
-- **RevenueCat** : Alternative pour gestion IAP mobile (à considérer)
+- **Stripe** : Abonnements récurrents (Checkout + Customer Portal)
+- **Webhooks** : Gérés via Supabase Edge Functions
 
 ### Services externes
-- **Notifications** : Expo Notifications
+- **Notifications** : Web Push API (Service Workers)
 - **Analytics** : Mixpanel ou PostHog
 - **Crash reporting** : Sentry
-- **CI/CD** : GitHub Actions + EAS Build
+- **CI/CD** : GitHub Actions + Vercel (ou self-hosted)
+- **Déploiement** : Vercel (recommandé) ou Docker
 
 ---
 
@@ -320,41 +322,45 @@ CREATE POLICY "Club members can view cash games" ON cash_games
 
 ---
 
-## Architecture Frontend (React Native)
+## Architecture Frontend (Next.js)
 
 ### Structure des dossiers
 ```
-src/
-├── components/          # Composants réutilisables
-│   ├── common/         # Boutons, inputs, cards
-│   ├── tournament/     # Timer, PlayerList, BlindStructure
-│   └── cashgame/       # BuyInForm, SettlementView
-├── screens/            # Écrans de l'app
-│   ├── auth/           # Login, Signup
-│   ├── tournaments/    # TournamentList, TournamentDetail, CreateTournament
-│   ├── cashgames/      # CashGameList, CashGameDetail
-│   ├── clubs/          # ClubList, ClubDetail
-│   └── settings/       # Profile, Subscription
-├── navigation/         # Configuration React Navigation
-├── stores/             # Zustand stores
-│   ├── authStore.ts
-│   ├── tournamentStore.ts
-│   └── cashGameStore.ts
-├── hooks/              # Custom hooks
-│   ├── useTournamentTimer.ts
-│   ├── useSubscription.ts
-│   └── useSupabase.ts
-├── services/           # Services externes
-│   ├── supabase.ts
-│   ├── stripe.ts
-│   └── notifications.ts
-├── utils/              # Fonctions utilitaires
-│   ├── prizeCalculator.ts
-│   ├── settlementOptimizer.ts
-│   └── formatters.ts
-├── types/              # Types TypeScript
-├── constants/          # Constantes
-└── theme/              # Theme et styles
+gpoker/
+├── app/                # Next.js App Router
+│   ├── layout.tsx     # Layout principal avec Navigation
+│   ├── page.tsx       # Page d'accueil
+│   ├── globals.css    # Styles globaux Tailwind
+│   ├── tournaments/   # Pages tournois
+│   │   ├── page.tsx   # Liste des tournois
+│   │   ├── [id]/      # Détail d'un tournoi
+│   │   └── new/       # Créer un tournoi
+│   ├── cash-games/    # Pages cash games
+│   │   ├── page.tsx
+│   │   └── [id]/
+│   ├── clubs/         # Pages clubs
+│   │   ├── page.tsx
+│   │   └── [id]/
+│   ├── auth/          # Authentification
+│   │   ├── login/
+│   │   └── signup/
+│   ├── settings/      # Paramètres utilisateur
+│   └── api/           # API Routes (webhooks Stripe, etc.)
+│       └── webhooks/
+├── components/         # Composants réutilisables
+│   ├── common/        # Button, Input, Card, Navigation
+│   ├── tournament/    # Timer, PlayerList, BlindStructure
+│   ├── cashgame/      # BuyInForm, SettlementView
+│   └── club/          # MemberList, ClubStats
+├── lib/               # Bibliothèques et utilitaires
+│   ├── supabase.ts    # Client Supabase
+│   ├── stores/        # Zustand stores
+│   ├── hooks/         # Custom hooks
+│   ├── services/      # Services métier
+│   ├── utils/         # Fonctions utilitaires
+│   └── types/         # Types TypeScript
+├── public/            # Assets statiques
+└── .env.local         # Variables d'environnement
 ```
 
 ### State Management
